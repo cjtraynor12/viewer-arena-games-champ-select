@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Viewer Game Champ Select</title>
+
+    <style>
+
+        html {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            background-image: url("https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/emotes/emotes-background.png");
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            height: 100%;
+            width: 100%;
+            background-color: #333333;
+            color: #d3d3d3;
+            margin: 0;
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+
+        body:after {
+            content: url("https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/action-button/button-lockin-hover.png") url("https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/action-button/button-lockin-click.png") url("https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/action-button/button-lockin-disable.png");
+            display: none;
+        }
+
+        textarea {
+            background-color: #222222;
+            color: lightgrey;
+        }
+
+        .font-size-20 {
+            font-size: 20px;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-row {
+            flex-direction: row;
+        }
+
+        .flex-column {
+            flex-direction: column;
+        }
+
+        .justify-content-center {
+            justify-content: center;
+        }
+
+        .align-items-center {
+            align-items: center;
+        }
+
+        .team-labels {
+            margin: 1px 8px;
+        }
+
+        .space-evenly {
+            justify-content: space-evenly;
+        }
+
+        .space-between {
+            justify-content: space-between;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .height-100 {
+            height: 100%;
+        }
+
+        .width-100 {
+            width: 100%;
+        }
+
+        .league-button {
+            color: inherit;
+            border: none;
+            padding: 0;
+            font: inherit;
+            cursor: pointer;
+            outline: inherit;
+            background: url("https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/action-button/button-lockin.png");
+            background-size: 100%;
+            width: 336px;
+            height: 92px;
+        }
+
+        .league-button:hover {
+            background: url("https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/action-button/button-lockin-hover.png");
+            background-size: 100%;
+            width: 336px;
+            height: 92px;
+        }
+
+        .league-button:active {
+            background: url("https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/action-button/button-lockin-click.png");
+            background-size: 100%;
+            width: 336px;
+            height: 92px;
+        }
+
+        .league-button:disabled {
+            background: url("https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/action-button/button-lockin-disable.png");
+            background-size: 100%;
+            width: 336px;
+            height: 92px;
+        }
+
+        .none {
+            display: none;
+        }
+
+        .team-container {
+            height: 140px;
+            margin-bottom: 16px;
+        }
+
+        .team-header-container {
+            position: relative;
+        }
+
+        .team-icon {
+            position: absolute;
+            bottom: -4px;
+            left: 16px;
+        }
+
+        .team-name {
+            position: absolute;
+            bottom: 4px;
+            left: 100px;
+            font-size: 22px;
+        }
+
+        .team-champions-container {
+            width: 210px;
+        }
+
+        .selected-champion-image {
+            position: absolute;
+            width: 145px;
+            height: 145px;
+            margin: 17px;
+            top: 0;
+            border-radius: 50%;
+        }
+
+        .champion-image {
+            width: 160px;
+            height: 160px;
+        }
+
+        .champion-circle {
+            position: absolute;
+            width: 152px;
+            height: 152px;
+            margin: 14px;
+            top: 0;
+        }
+
+        .champion-spinner {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            top: 0;
+        }
+
+        #champions_container {
+            height: 500px;
+        }
+
+        #pools_container {
+            height: 500px;
+        }
+
+        .poolButton {
+            font-size: 24px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            background-color: #141452;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .selected {
+            outline: 2px solid royalblue;
+        }
+
+        .championButton {
+            margin: 32px;
+            font-size: 24px;
+        }
+
+        #left_teams_column {
+            padding-top: 32px;
+            padding-left: 64px;
+            width: 390px;
+            /*background-color: #222222;*/
+        }
+
+        #center_champ_select_column {
+            flex-grow: 1;
+            margin-left: 64px;
+            margin-right: 64px;
+        }
+
+        #right_teams_column {
+            padding-top: 32px;
+            padding-right: 64px;
+            width: 390px;
+            /*background-color: #222222;*/
+        }
+
+        .rotate {
+            position: absolute;
+            -webkit-animation:spin 4s linear infinite;
+            -moz-animation:spin 4s linear infinite;
+            animation:spin 4s linear infinite;
+        }
+        @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+        @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+        @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
+        .debug {
+            background-color: #333333;
+        }
+
+    </style>
+
+    <script>
+
+        // Urls
+        const championJsonDataUrl = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-summary.json";
+        const communityDragonBaseUrl = "https://raw.communitydragon.org/14.9/game/";
+        const baseSquarePortraitPath = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/";
+
+        // Assets
+        const championRing = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png";
+        const teamIcons = [
+            "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/gromp.png",
+            "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/krug.png",
+            "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/minion.png",
+            "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/poro.png",
+            "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/raptor.png",
+            "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/scuttle.png",
+            "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/sentinel.png",
+            "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/wolf.png",
+        ]
+
+        // Variables
+        let championJsonData;
+        let championNameToImage = [];
+        let pools = [];
+        let currentPage = 0;
+        let currentTurn = -1;
+        let selectedPool = null;
+        let selectedChampion = null;
+
+        function parsePools() {
+            const poolsText = document.getElementById("pools_textarea").value;
+            const poolsLines = poolsText.split("\n");
+
+            let currentPool = "";
+
+            for (let i = 0; i < poolsLines.length; i++) {
+                const line = poolsLines[i].trim();
+
+                if (!line) {
+                    continue;
+                }
+
+                if (line.startsWith("<") && line.endsWith(">")) {
+                    currentPool = line.replaceAll("<", "").replaceAll(">","");
+                    pools[currentPool] = [];
+                } else if (line !== "\n") {
+                    pools[currentPool].push(line);
+                }
+            }
+
+            for (const poolName in pools) {
+                if (pools[poolName].length === 0) {
+                    delete pools[poolName];
+                }
+            }
+
+            console.log(pools);
+
+            switchPages();
+
+        }
+
+        function switchPages() {
+            const setupPage = document.getElementById("setup_page");
+            const champSelectPage = document.getElementById("champ_select_page");
+
+            if (currentPage === 0) {
+                setupPage.classList.add("none");
+                champSelectPage.classList.remove("none");
+            } else {
+                champSelectPage.classList.add("none");
+                setupPage.classList.remove("none");
+
+            }
+        }
+
+        function startChampSelect() {
+            // Check that the two textareas look valid
+
+            // Parse pool into arrays
+            parsePools();
+
+            // Split teams into 8 strings
+            setTeamNames();
+
+            // Display any errors
+
+            populatePoolElements();
+
+            // Start first selection
+            changePlayer();
+        }
+
+        function changePlayer() {
+            currentTurn++;
+
+            const players = getAllPlayerElements();
+            players.forEach((player) => setSpinnerState(player, false));
+
+            if (currentTurn > 15) {
+                document.getElementById("pool_lock_in_button").disabled = true;
+                document.getElementById("pool_lock_in_button").parentElement.classList.add("none");
+                document.getElementById("champion_lock_in_button").disabled = true;
+                return;
+            }
+
+            const currentPlayer = getCurrentPlayerElement();
+            setSpinnerState(currentPlayer, true);
+
+            const championsContainer = document.getElementById("champions_container");
+            championsContainer.innerHTML = "";
+
+            // Display pools container
+            document.getElementById("pools_container").classList.remove("none");
+            document.getElementById("pool_lock_in_button").disabled = true;
+            document.getElementById("champion_lock_in_button").disabled = true;
+        }
+
+        function setSpinnerState(player, state) {
+           const spinner = player.querySelector(".champion-spinner");
+           if (state) {
+               spinner.classList.remove("none");
+           } else {
+               spinner.classList.add("none");
+           }
+        }
+
+        function getAllPlayerElements() {
+            return document.querySelectorAll(".player");
+        }
+
+        function populatePoolElements() {
+            const poolsContainer = document.getElementById("pools_container");
+
+            for (const [key, value] of Object.entries(pools)) {
+                console.log(key);
+                const poolElement = createPoolElement(key);
+                console.log(poolElement);
+                poolsContainer.appendChild(poolElement);
+            }
+        }
+
+        function createPoolElement(name) {
+            const container = document.createElement("div");
+            const poolClassName = name.replaceAll(" ","_");
+            container.setAttribute("class", "poolButton " + poolClassName);
+            container.setAttribute("onclick", "setSelectedPool('" + name + "')");
+
+            const poolName = document.createElement("span");
+            poolName.innerText = name;
+            poolName.style = "pointer-events: none;"
+            container.appendChild(poolName);
+
+            // const image = document.createElement("img");
+            // image.setAttribute("src", baseSquarePortraitPath + champion['id'] + ".png")
+            // container.appendChild(image);
+
+            return container;
+        }
+
+        function populateChampionElements() {
+            const championsContainer = document.getElementById("champions_container");
+
+            // Shuffle the array
+            const championsList = pools[selectedPool].sort(() => Math.random() - 0.5);
+            const randomChampions = championsList.slice(0,3);
+
+            for (const champion of randomChampions) {
+                championsContainer.appendChild(createChampionElement(champion));
+            }
+        }
+
+        function createChampionElement(name) {
+            const container = document.createElement("div");
+            container.setAttribute("class", "championButton flex justify-content-center text-center flex-column");
+            container.setAttribute("onclick", 'setSelectedChampion("' + name + '")');
+
+            const championName = document.createElement("span");
+            championName.innerText = name;
+            championName.setAttribute("style", "margin-bottom: 8px;")
+            container.appendChild(championName);
+
+            let champImage = championNameToImage[name.toLowerCase()] ?? "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/champion-bench/moreinfo4k_default.png";
+
+            const image = document.createElement("img");
+            image.setAttribute("src", champImage)
+            image.setAttribute("class", "champion-image")
+            container.appendChild(image);
+
+            return container;
+        }
+
+        function lockInPool() {
+            populateChampionElements();
+            // Hide pools container
+            document.getElementById("pools_container").classList.add("none");
+            document.getElementById("pool_lock_in_button").parentElement.classList.add("none");
+            document.getElementById("pool_lock_in_button").disabled = true;
+            // Show champions container
+            document.getElementById("champions_container").classList.remove("none");
+            document.getElementById("champion_lock_in_button").parentElement.classList.remove("none");
+            document.getElementById("champion_lock_in_button").disabled = true;
+
+            // Unselect pool buttons
+            const poolButtons = document.getElementById("pools_container").querySelectorAll(".poolButton");
+            poolButtons.forEach((button) => button.classList.remove("selected"));
+        }
+
+        function lockInChampion() {
+            document.getElementById("pool_lock_in_button").parentElement.classList.remove("none");
+            document.getElementById("champion_lock_in_button").parentElement.classList.add("none");
+            document.getElementById("champions_container").classList.add("none");
+
+            changePlayer();
+        }
+
+        function setSelectedPool(name) {
+            selectedPool = name;
+            console.log(selectedPool);
+            document.getElementById("pool_lock_in_button").disabled = false;
+
+            const poolButtons = document.getElementById("pools_container").querySelectorAll(".poolButton");
+            poolButtons.forEach((button) => button.classList.remove("selected"));
+
+            const poolClassName = name.replaceAll(" ","_");
+            document.getElementById("pools_container").querySelector("." + poolClassName).classList.add("selected");
+        }
+
+        function setSelectedChampion(name) {
+            selectedChampion = name;
+
+            const playerElement = getCurrentPlayerElement();
+            const championImageElement = playerElement.querySelector(".selected-champion-image");
+
+            championImageElement.src = championNameToImage[selectedChampion.toLowerCase()] ?? "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/champion-bench/moreinfo4k_default.png";
+
+            console.log(selectedChampion);
+
+            document.getElementById("champion_lock_in_button").disabled = false;
+        }
+
+        function getCurrentPlayerElement() {
+            let teamNumber;
+            let playerNumber;
+
+            // First get team number
+            if (currentTurn < 8) {
+                teamNumber = currentTurn + 1;
+                playerNumber = 1;
+            } else {
+                teamNumber = (currentTurn - 16) * -1;
+                playerNumber = 2;
+            }
+
+            const container = document.getElementById("section-team-" + teamNumber);
+            const playerElement = container.querySelector(".player-" + playerNumber);
+
+            return playerElement;
+        }
+
+        function setTeamNames() {
+            for (let i = 1; i <= 8; i++) {
+                const container = document.getElementById("section-team-" + i);
+                const teamName = container.querySelector(".team-name");
+
+                const teamsRawString = document.getElementById("teams_textarea").value;
+                const teamsArray = teamsRawString.split("\n");
+
+                teamName.innerHTML = teamsArray[i-1].replace(",","<br>");
+            }
+        }
+
+        async function getChampionJson() {
+            const response = await fetch(championJsonDataUrl);
+            championJsonData = await response.json();
+
+            championJsonData.map((champion) => {
+                championNameToImage[champion.name.toLowerCase()] = baseSquarePortraitPath + champion.id + ".png";
+            });
+
+            const imagePreloader = document.getElementById("image-preloader");
+
+            for (const name in championNameToImage) {
+                const image = championNameToImage[name.toLowerCase()];
+                const champImage = document.createElement("img");
+                champImage.setAttribute("src", image)
+                imagePreloader.appendChild(champImage);
+            }
+
+        }
+
+        getChampionJson();
+
+    </script>
+
+</head>
+<body>
+    <div id="setup_page" class="height-100 font-size-20 flex flex-column justify-content-center">
+        <div class="flex space-evenly">
+            <div class="flex flex-column justify-content-center align-items-center height-100">
+                <label for="pools_textarea">Pools</label>
+                <textarea id="pools_textarea" class="font-size-20" style="height: 500px; width: 300px;"></textarea>
+                <a href="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-summary.json" target="_blank">Valid Champion Names</a>
+            </div>
+
+            <div class="flex justify-content-center align-items-center">
+                <div class="flex flex-column align-items-center">
+                    <span style="height: 20px"></span>
+                    <span class="team-labels">Team 1</span>
+                    <span class="team-labels">Team 2</span>
+                    <span class="team-labels">Team 3</span>
+                    <span class="team-labels">Team 4</span>
+                    <span class="team-labels">Team 5</span>
+                    <span class="team-labels">Team 6</span>
+                    <span class="team-labels">Team 7</span>
+                    <span class="team-labels">Team 8</span>
+                </div>
+                <div class="flex flex-column align-items-center">
+                    <label for="teams_textarea">Teams</label>
+                    <textarea id="teams_textarea" rows="8" class="font-size-20" style="width: 500px;" autocomplete="off"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="flex align-items-center justify-content-center" style="margin-top: 128px;">
+            <button onclick="startChampSelect()" class="league-button"></button>
+            <span style="position: absolute; font-size: 32px; pointer-events: none;">Start</span>
+        </div>
+    </div>
+
+    <div id="champ_select_page" class="none height-100 flex flex-row">
+        <div id="left_teams_column" class="flex space-evenly height-100 flex-column">
+            <div id="section-team-1" class="team-container width-100 flex flex-column">
+                <div class="team-header-container">
+                    <img class="team-icon" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/poro.png">
+                    <span class="team-name"></span>
+                </div>
+                <div class="team-champions-container flex flex-row space-between">
+                    <div class="player player-1" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                    <div class="player player-2" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                </div>
+            </div>
+            <div id="section-team-2" class="team-container width-100 flex flex-column">
+                <div class="team-header-container">
+                    <img class="team-icon" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/poro.png">
+                    <span class="team-name"></span>
+                </div>
+                <div class="team-champions-container flex flex-row space-between">
+                    <div class="player player-1" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                    <div class="player player-2" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                </div>
+            </div>
+            <div id="section-team-3" class="team-container width-100 flex flex-column">
+                <div class="team-header-container">
+                    <img class="team-icon" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/poro.png">
+                    <span class="team-name"></span>
+                </div>
+                <div class="team-champions-container flex flex-row space-between">
+                    <div class="player player-1" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                    <div class="player player-2" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                </div>
+            </div>
+            <div id="section-team-4" class="team-container width-100 flex flex-column">
+                <div class="team-header-container">
+                    <img class="team-icon" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/poro.png">
+                    <span class="team-name"></span>
+                </div>
+                <div class="team-champions-container flex flex-row space-between">
+                    <div class="player player-1" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                    <div class="player player-2" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="center_champ_select_column" class="height-100">
+            <div class="flex flex-column justify-content-center align-items-center height-100">
+                <div id="pools_container" class="width-100 flex flex-column justify-content-center align-items-center">
+                </div>
+                <div id="champions_container" class="width-100 flex justify-content-center align-items-center none">
+                </div>
+                <div class="flex align-items-center justify-content-center" style="margin-top: 64px;">
+                    <button id="pool_lock_in_button" onclick="lockInPool()" class="league-button lock-in-button" disabled></button>
+                    <span style="position: absolute; font-size: 32px; pointer-events: none;">Lock In</span>
+                </div>
+                <div class="flex align-items-center justify-content-center none" style="margin-top: 64px;">
+                    <button id="champion_lock_in_button" onclick="lockInChampion()" class="league-button lock-in-button" disabled></button>
+                    <span style="position: absolute; font-size: 32px; pointer-events: none;">Lock In</span>
+                </div>
+            </div>
+        </div>
+        <div id="right_teams_column" class="flex space-evenly height-100 flex-column">
+            <div id="section-team-5" class="team-container width-100 flex flex-column">
+                <div class="team-header-container">
+                    <img class="team-icon" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/poro.png">
+                    <span class="team-name"></span>
+                </div>
+                <div class="team-champions-container flex flex-row space-between">
+                    <div class="player player-1" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                    <div class="player player-2" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                </div>
+            </div>
+            <div id="section-team-6" class="team-container width-100 flex flex-column">
+                <div class="team-header-container">
+                    <img class="team-icon" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/poro.png">
+                    <span class="team-name"></span>
+                </div>
+                <div class="team-champions-container flex flex-row space-between">
+                    <div class="player player-1" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                    <div class="player player-2" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                </div>
+            </div>
+            <div id="section-team-7" class="team-container width-100 flex flex-column">
+                <div class="team-header-container">
+                    <img class="team-icon" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/poro.png">
+                    <span class="team-name"></span>
+                </div>
+                <div class="team-champions-container flex flex-row space-between">
+                    <div class="player player-1" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                    <div class="player player-2" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                </div>
+            </div>
+            <div id="section-team-8" class="team-container width-100 flex flex-column">
+                <div class="team-header-container">
+                    <img class="team-icon" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/subteams/poro.png">
+                    <span class="team-name"></span>
+                </div>
+                <div class="team-champions-container flex flex-row space-between">
+                    <div class="player player-1" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                    <div class="player player-2" style="position: relative;">
+                        <img class="selected-champion-image" src="">
+                        <img class="champion-circle" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-ring.png">
+                        <img class="champion-spinner rotate none" src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-champ-select/global/default/images/summoner-object/player-object-spinner-gold.png">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="image-preloader" class="none"></div>
+</body>
+<script>
+
+    function setTeamIcons() {
+        for (let i = 1; i <= 8; i++) {
+            const container = document.getElementById("section-team-" + i);
+            const teamIcon = container.querySelector(".team-icon");
+
+            teamIcon.src = teamIcons[i-1];
+        }
+    }
+
+    function init() {
+        const poolsDefault = `<Artillery Mage>
+Xerath
+Vel'koz
+Hwei
+Lux
+Ziggs
+
+<Control Mage>
+Syndra
+Orianna
+Anivia
+Seraphine
+Viktor
+
+<Tank>
+Sion
+Maokai
+Thresh
+Skarner
+Ornn
+Amumu
+Taric
+
+<Bruiser>
+Wukong
+Jarvan IV
+Irelia
+Fiora
+Lee Sin
+Aatrox
+
+<Enchanter>
+Lulu
+Soraka
+Sona
+Renata Glasc
+Nami
+Janna
+Milio
+
+<Marksman>
+Miss Fortune
+Sivir
+Kai'Sa
+Ezreal
+Xayah
+Lucian
+Kalista
+
+<Gold or below players>
+K'Sante
+Gwen
+Bel'Veth
+Galio
+Yuumi
+Zed
+Yone
+Yasuo
+Gragas`
+        const poolsTextarea = document.getElementById("pools_textarea");
+        poolsTextarea.innerHTML = poolsDefault;
+
+        const teamsDefault = `Player 1, Player 2
+Player 1, Player 2
+Player 1, Player 2
+Player 1, Player 2
+Player 1, Player 2
+Player 1, Player 2
+Player 1, Player 2
+Player 1, Player 2`;
+
+        const teamsTextarea = document.getElementById("teams_textarea");
+        teamsTextarea.innerHTML = teamsDefault;
+
+        setTeamIcons();
+    }
+
+    init();
+</script>
+</html>
