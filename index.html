@@ -265,6 +265,8 @@
         let currentTurn = -1;
         let selectedPool = null;
         let selectedChampion = null;
+        let playerChampionChoices = [];
+
 
         function parsePools() {
             const poolsText = document.getElementById("pools_textarea").value;
@@ -401,7 +403,13 @@
             const championsContainer = document.getElementById("champions_container");
 
             // Shuffle the array
-            const championsList = pools[selectedPool].sort(() => Math.random() - 0.5);
+            let championsList = pools[selectedPool].sort(() => Math.random() - 0.5);
+            // No duplicates on a team
+            if (currentTurn > 7) {
+                const partnerId = (currentTurn - 15) * -1;
+                console.log("Partner", playerChampionChoices[partnerId]);
+                championsList = championsList.filter((champion) => champion !== playerChampionChoices[partnerId]);
+            }
             const randomChampions = championsList.slice(0,3);
 
             for (const champion of randomChampions) {
@@ -449,6 +457,8 @@
             document.getElementById("pool_lock_in_button").parentElement.classList.remove("none");
             document.getElementById("champion_lock_in_button").parentElement.classList.add("none");
             document.getElementById("champions_container").classList.add("none");
+
+            playerChampionChoices.push(selectedChampion);
 
             changePlayer();
         }
